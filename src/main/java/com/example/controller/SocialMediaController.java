@@ -3,9 +3,11 @@ package com.example.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,8 +36,25 @@ public class SocialMediaController {
     }
 
     @PostMapping("/register") 
-    public Account registerNewAccount(@RequestBody Account account) {
-        return accountService.registerAccount(account);
+    public ResponseEntity<Account> registerNewAccount(@RequestBody Account account) {
+        Account newAccount = accountService.registerAccount(account);
+        if (newAccount == null){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+        else{
+            return ResponseEntity.ok().body(newAccount); 
+        }
+    }
+
+    @PostMapping("/login") 
+    public ResponseEntity<Account> login(@RequestBody Account account) {
+        Account newAccount = accountService.loginAccount(account);
+        if (newAccount == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else{
+            return ResponseEntity.ok().body(newAccount); 
+        }
     }
 
     @GetMapping("/messages/{message_id}")
@@ -48,6 +67,34 @@ public class SocialMediaController {
     public List<Message> getAllMessages(){
         List<Message> list = messageService.getAllMessages();
         return list;
+    }
+
+    @GetMapping("/accounts/{account_id}/messages")
+    public List<Message> getAllMessagesFromUser(@PathVariable Integer account_id){
+        List<Message> list = messageService.getAllMessagesByUser(account_id);
+        return list;
+    }
+
+    @PostMapping("/messages")
+    public ResponseEntity<?> createMessage(@RequestBody Message message){
+        Message newMessage = messageService.createNewMessage(message);
+        if(newMessage == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.ok(newMessage);       
+
+        
+    }
+    
+    @PatchMapping("/messages/{message_id}") 
+    public ResponseEntity<?> updateMessage(@PathVariable Integer message_id, @RequestBody Message message) {
+        Message newMessage = messageService.updateMessage(message_id, message);
+        if (newMessage == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        else{
+            return ResponseEntity.ok().body(1); 
+        }
     }
 
     @DeleteMapping("/messages/{message_id}")
