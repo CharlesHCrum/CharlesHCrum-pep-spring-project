@@ -134,7 +134,7 @@ public class SocialMediaController {
     }
 
     /*
-     * Deletes an already existing message
+     * Deletes an already existing message        
      * Status 200 regardless of success
      * @return ResponseEntity with number of rows altered (at most one)
      */
